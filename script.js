@@ -34,25 +34,40 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 });
 
 // Helper function to show data on the page
-function displayResults(books) {
+function displayResults(data) {
     const container = document.getElementById('resultsContainer');
     container.innerHTML = ''; // Clear previous results
 
-    if (books.length === 0) {
+    // FIX: Access the 'results' array inside the data object
+    const books = data.results; 
+
+    // Check if we actually have results
+    if (!books || books.length === 0) {
         container.innerHTML = '<p>No books found.</p>';
         return;
     }
 
-    // Loop through books and create HTML cards
+    // Now loop through the ACTUAL list of books
     books.forEach(book => {
         const card = document.createElement('div');
         card.className = 'book-card';
         
-        // We'll use book.title and book.author (we define this structure in Python later)
+        // Safety check for missing data
+        const title = book.title || "No Title";
+        const author = book.author || "Unknown Author";
+        const link = book.link || "#";
+        let coverHtml = '';
+
+        if (book.cover) {
+            coverHtml = `<img src="${book.cover}" alt="${title}" style="max-width:100px; float:left; margin-right:10px;">`;
+        }
+
         card.innerHTML = `
-            <h3>${book.title}</h3>
-            <p>Author: ${book.author}</p>
-            <a href="${book.link}" target="_blank">Read / Download</a>
+            ${coverHtml}
+            <h3>${title}</h3>
+            <p>Author: ${author}</p>
+            <a href="${link}" target="_blank">Read / Download</a>
+            <div style="clear:both;"></div>
         `;
         
         container.appendChild(card);
