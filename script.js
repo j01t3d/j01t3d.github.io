@@ -38,38 +38,56 @@ function displayResults(data) {
     const container = document.getElementById('resultsContainer');
     container.innerHTML = ''; // Clear previous results
 
-    // FIX: Access the 'results' array inside the data object
-    const books = data.results; 
+    const books = data.results;
 
-    // Check if we actually have results
     if (!books || books.length === 0) {
-        container.innerHTML = '<p>No books found.</p>';
+        container.innerHTML = '<p class="placeholder">No books found.</p>';
         return;
     }
 
-    // Now loop through the ACTUAL list of books
+    // 1. Create the Table and Header
+    const table = document.createElement('table');
+    table.id = "resultsTable";
+
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th style="width: 60px;">Cover</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th style="width: 100px;">Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+
+    // 2. Loop through books and add a row for each
     books.forEach(book => {
-        const card = document.createElement('div');
-        card.className = 'book-card';
-        
-        // Safety check for missing data
+        const row = document.createElement('tr');
+
+        // Handle the Cover Image
+        let coverHtml = '<span style="color:#ccc;">No Cover</span>';
+        if (book.cover) {
+            coverHtml = `<img src="${book.cover}" class="book-cover" alt="Cover">`;
+        }
+
+        // Safety checks for data
         const title = book.title || "No Title";
         const author = book.author || "Unknown Author";
         const link = book.link || "#";
-        let coverHtml = '';
 
-        if (book.cover) {
-            coverHtml = `<img src="${book.cover}" alt="${title}" style="max-width:100px; float:left; margin-right:10px;">`;
-        }
-
-        card.innerHTML = `
-            ${coverHtml}
-            <h3>${title}</h3>
-            <p>Author: ${author}</p>
-            <a href="${link}" target="_blank">Read / Download</a>
-            <div style="clear:both;"></div>
+        row.innerHTML = `
+            <td>${coverHtml}</td>
+            <td><strong>${title}</strong></td>
+            <td>${author}</td>
+            <td><a href="${link}" target="_blank" class="read-link">Read</a></td>
         `;
-        
-        container.appendChild(card);
+
+        tbody.appendChild(row);
     });
+
+    // 3. Add the finished table to the page
+    container.appendChild(table);
 }
