@@ -14,6 +14,8 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
     filters = new Filters("public"); // PLACEHOLDER filter to filter by public books
 
+    // need to change search bar size, add dropdown box for availability, then add check to READ from that dropdown box here
+
     // Update UI to show loading
     const resultsContainer = document.getElementById('resultsContainer');
     resultsContainer.innerHTML = '<p>Searching archives...</p>';
