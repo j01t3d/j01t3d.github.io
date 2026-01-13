@@ -49,6 +49,8 @@ def search_books():
         for book in docs:
             # Safety check: Sometimes data is missing
             title = book.get("title", "Unknown Title")
+
+            viewable = book.get("ebook_access")
             
             # Get the first author listed (sometimes it's a list, sometimes string)
             authors = book.get("author_name", ["Unknown Author"])
@@ -67,6 +69,7 @@ def search_books():
                 "title": title,
                 "author": author_name,
                 "cover": cover_url,
+                "viewable": viewable,
                 "link": book_url
             })
 

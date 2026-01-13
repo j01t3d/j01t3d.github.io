@@ -50,11 +50,15 @@ button {
     font-size: 16px;
 }
 
-.view-more-box, #viewMoreButton {
+.view-more-box, #viewMoreBtn {
     padding: 10px 30px;
     margin: auto;
     text-align: center;
     align-items: center;
+}
+
+#viewMoreBtn {
+    display: none;
 }
 
 
