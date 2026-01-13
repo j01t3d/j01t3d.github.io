@@ -1,6 +1,7 @@
 const API_URL = "https://j01t3d-github-io.onrender.com";
 let pageNumber = 1;
 let table;
+let filters;
 
 // Listen for the click
 document.getElementById('searchBtn').addEventListener('click', async () => {
@@ -9,22 +10,26 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     // Basic validation
     if (!query) return;
 
-    // 1. Update UI to show loading
+    // Create filters based on settings
+
+    filters = new Filters("public"); // PLACEHOLDER filter to filter by public books
+
+    // Update UI to show loading
     const resultsContainer = document.getElementById('resultsContainer');
     resultsContainer.innerHTML = '<p>Searching archives...</p>';
 
     try {
-        // 2. Call the Render Backend
+        // Call the Render Backend
         const response = await fetch(`${API_URL}/search?q=${query}`);
         
-        // 3. Check if the response is okay
+        // Check if the response is okay
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
 
-        // 4. Display the results
+        // Display the results
         displayResults(data);
 
         document.getElementById('viewMoreBtn').style.display = "block";
@@ -100,7 +105,7 @@ function displayResults(data) {
 
     // 2. Loop through books and add a row for each
     books.forEach(book => {
-        if (book.viewable = "public") {
+        if (matchFilters(book) == true) { // check if the book matches the filters
             const row = document.createElement('tr');
 
             // Handle the Cover Image
@@ -127,4 +132,22 @@ function displayResults(data) {
 
     // 3. Add the finished table to the page
     container.appendChild(table);
+}
+
+class Filters { // filters class!
+    constructor(viewable) {
+        this.viewable = viewable;
+    }
+}
+
+function matchFilters(book) {
+    if ( // match filters against the ones grabbed from user's selected filters
+        book.viewable == filters.viewable // &&
+        // book.(other filters) == filters.(other filters) &&
+        // book.(other filters) == filters.(other filters)
+    ) { // if all filters match
+        return true; 
+    } else { // if NOT all filters match
+        return false;
+    }
 }
