@@ -18,8 +18,12 @@ def home():
 @app.route('/search', methods=['GET'])
 def search_books():
     # 1. Get the search term from the URL (e.g., ?q=Harry+Potter)
-    query = str(request).partition('?')
+    newRequest = f""
+    for arg in request.args:
+        newRequest += arg
     
+    query = newRequest.partition("?")
+
     if not query:
         return jsonify({"error": "No query provided"}), 400
 
@@ -77,7 +81,7 @@ def search_books():
     except Exception as e:
         # Catch errors
         print(f"Error: {e}")
-        return jsonify({"error": "Internal Server Error " + e}), 500
+        return jsonify({"error": "Internal Server Error"}), 500
 
 # --- RUN THE APP ---
 if __name__ == '__main__':
