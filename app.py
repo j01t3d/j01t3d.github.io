@@ -1,7 +1,7 @@
 import os
-import requests
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+import requests # pyright: ignore[reportMissingModuleSource]
+from flask import Flask, jsonify, request # pyright: ignore[reportMissingImports, reportMissingModuleSource]
+from flask_cors import CORS # pyright: ignore[reportMissingModuleSource]
 
 app = Flask(__name__)
 CORS(app)
