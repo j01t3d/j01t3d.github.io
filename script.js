@@ -18,11 +18,12 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     try {
         // Call the Render Backend
         search = `${API_URL}/search?q=${query}`;
+        console.log(query);
         const response = await fetch(search);
         
         // Check if the response is okay
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Network response was not ok: ' + JSON.stringify(response));
         }
 
         const data = await response.json();

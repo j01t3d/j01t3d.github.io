@@ -18,7 +18,7 @@ def home():
 @app.route('/search', methods=['GET'])
 def search_books():
     # 1. Get the search term from the URL (e.g., ?q=Harry+Potter)
-    query = request.partition('?')
+    query = str(request).partition('?')
     
     if not query:
         return jsonify({"error": "No query provided"}), 400
