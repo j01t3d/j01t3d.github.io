@@ -25,7 +25,8 @@ def search_books():
 
     try:
         # 2. Call the Open Library API
-        response = requests.get(f"{OPEN_LIBRARY_URL}?{query[2]}&limit=10")
+        search = f"{OPEN_LIBRARY_URL}" + f"?" + f"{query[2]}" + f"&limit=10"
+        response = requests.get(search)
         
         # Check if Open Library replied successfully
         if response.status_code != 200:
