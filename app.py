@@ -1,17 +1,12 @@
 import os
 import requests
 from flask import Flask, jsonify, request
-from flask_cors import CORS # IMPORTANT: This allows your GitHub Page to talk to Render
+from flask_cors import CORS
 
 app = Flask(__name__)
-
-# Enable CORS (Cross-Origin Resource Sharing)
-# This is required because your GitHub Page (github.io) is a different domain 
-# than your Render API (onrender.com)
 CORS(app)
 
 # --- CONFIGURATION ---
-# We will add the Database logic later, but let's get the API working first.
 OPEN_LIBRARY_URL = "https://openlibrary.org/search.json"
 
 # --- ROUTES ---
@@ -23,15 +18,14 @@ def home():
 @app.route('/search', methods=['GET'])
 def search_books():
     # 1. Get the search term from the URL (e.g., ?q=Harry+Potter)
-    query = request.args.get('q')
+    _, _, query = request.partition('?')
     
     if not query:
         return jsonify({"error": "No query provided"}), 400
 
     try:
         # 2. Call the Open Library API
-        # We limit results to 10 for now to keep it fast
-        response = requests.get(f"{OPEN_LIBRARY_URL}?q={query}&limit=10")
+        response = requests.get(f"{OPEN_LIBRARY_URL}?{query}&limit=10")
         
         # Check if Open Library replied successfully
         if response.status_code != 200:
@@ -39,8 +33,7 @@ def search_books():
 
         data = response.json()
 
-        # 3. Clean up the data for your Frontend
-        # Open Library sends a LOT of data. We only want what we need.
+        # 3. Clean up the data for Frontend
         formatted_results = []
         
         # 'docs' is the key in the JSON that holds the list of books
@@ -73,7 +66,7 @@ def search_books():
                 "link": book_url
             })
 
-        # 4. Send the clean data back to your JavaScript
+        # 4. Send the clean data back to the JavaScript
         return jsonify({
             "source": "Open Library",
             "count": len(formatted_results),
@@ -81,7 +74,7 @@ def search_books():
         })
 
     except Exception as e:
-        # Catch any errors (like internet going down)
+        # Catch errors
         print(f"Error: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 

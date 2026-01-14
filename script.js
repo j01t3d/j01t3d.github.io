@@ -1,7 +1,6 @@
 const API_URL = "https://j01t3d-github-io.onrender.com";
 let pageNumber = 1;
-let table;
-let filters;
+let table, search, filters, availabilityValue;
 
 // Listen for the click
 document.getElementById('searchBtn').addEventListener('click', async () => {
@@ -10,11 +9,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     // Basic validation
     if (!query) return;
 
-    // Create filters based on settings
-
-    filters = new Filters("public"); // PLACEHOLDER filter to filter by public books
-
-    // need to change search bar size, add dropdown box for availability, then add check to READ from that dropdown box here
+    createFilter();
 
     // Update UI to show loading
     const resultsContainer = document.getElementById('resultsContainer');
@@ -22,7 +17,8 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
 
     try {
         // Call the Render Backend
-        const response = await fetch(`${API_URL}/search?q=${query}`);
+        search = `${API_URL}/search?q=${query}`;
+        const response = await fetch(search);
         
         // Check if the response is okay
         if (!response.ok) {
@@ -32,6 +28,7 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
         const data = await response.json();
 
         // Display the results
+        table = ''; // clear table
         displayResults(data);
 
         document.getElementById('viewMoreBtn').style.display = "block";
@@ -48,21 +45,27 @@ document.getElementById('viewMoreBtn').addEventListener('click', async () => {
     // Basic validation
     if (!query) return;
 
-    // 1. Update UI to show loading
+    // Update UI to show loading
+    const resultsContainer = document.getElementById('resultsContainer');
+    resultsContainer.innerHTML = '<p>Searching archives...</p>';
+    pageNumber += 1;
 
     try {
-        // 2. Call the Render Backend
-        const response = await fetch(`${API_URL}/search?q=${query}&page=${pageNumber+1}`);
-        pageNumber += 1;
+        // Call the Render Backend
+        pageField = `&page=${pageNumber}`;
+        search = (`${API_URL}/search?q=${query}` + pageField);
+
+        const response = await fetch(search);
+        console.log(search);
         
-        // 3. Check if the response is okay
+        // Check if the response is okay
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
 
-        // 4. Display the results
+        // Display the results
         displayResults(data);
 
     } catch (error) {
@@ -101,6 +104,8 @@ function displayResults(data) {
             </thead>
             <tbody></tbody>
         `;
+    } else {
+
     }
 
     const tbody = table.querySelector('tbody');
@@ -108,27 +113,29 @@ function displayResults(data) {
     // 2. Loop through books and add a row for each
     books.forEach(book => {
         if (matchFilters(book) == true) { // check if the book matches the filters
-            const row = document.createElement('tr');
+                const row = document.createElement('tr');
 
-            // Handle the Cover Image
-            let coverHtml = '<span style="color:#ccc;">No Cover</span>';
-            if (book.cover) {
-                coverHtml = `<img src="${book.cover}" class="book-cover" alt="Cover" style="max-width: 50px; max-height: 75px;">`;
-            }
+                // Handle the Cover Image
+                let coverHtml = '<span style="color:#ccc;">No Cover</span>';
+                if (book.cover) {
+                    coverHtml = `<img src="${book.cover}" class="book-cover" alt="Cover" style="max-width: 50px; max-height: 75px;">`;
+                }
 
-            // Safety checks for data
-            const title = book.title || "No Title";
-            const author = book.author || "Unknown Author";
-            const link = book.link || "#";
+                // Safety checks for data
+                const title = book.title || "No Title";
+                const author = book.author || "Unknown Author";
+                const link = book.link || "#";
 
-            row.innerHTML = `
-                <td>${coverHtml}</td>
-                <td><strong>${title}</strong></td>
-                <td>${author}</td>
-                <td><a href="${link}" target="_blank" class="read-link">Read</a></td>
-            `;
+                row.innerHTML = `
+                    <td>${coverHtml}</td>
+                    <td><strong>${title}</strong></td>
+                    <td>${author}</td>
+                    <td><a href="${link}" target="_blank" class="read-link">Read</a></td>
+                `;
 
-            tbody.appendChild(row);
+                tbody.appendChild(row);
+        } else {
+            console.log(matchFilters(book));
         }
     });
 
@@ -142,7 +149,15 @@ class Filters { // filters class!
     }
 }
 
+function createFilter() {
+    availabilityValue = document.getElementById('availabilityFilter').value;
+    if (availabilityValue != 'all') { // there IS a filter
+        filters = new Filters(availabilityValue);
+    } else {filters = 0;} // there is NOT a filter
+}
+
 function matchFilters(book) {
+    if (filters == 0) {return true;}
     if ( // match filters against the ones grabbed from user's selected filters
         book.viewable == filters.viewable // &&
         // book.(other filters) == filters.(other filters) &&

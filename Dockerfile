@@ -16,5 +16,5 @@ COPY . .
 # Render uses port 80 by default for web services
 EXPOSE 80
 
-# Command to run your app
+# Command to run app
 CMD ["python", "app.py"]
