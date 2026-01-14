@@ -18,14 +18,14 @@ def home():
 @app.route('/search', methods=['GET'])
 def search_books():
     # 1. Get the search term from the URL (e.g., ?q=Harry+Potter)
-    _, _, query = request.partition('?')
+    query = request.partition('?')
     
     if not query:
         return jsonify({"error": "No query provided"}), 400
 
     try:
         # 2. Call the Open Library API
-        response = requests.get(f"{OPEN_LIBRARY_URL}?{query}&limit=10")
+        response = requests.get(f"{OPEN_LIBRARY_URL}?{query[2]}&limit=10")
         
         # Check if Open Library replied successfully
         if response.status_code != 200:
@@ -76,7 +76,7 @@ def search_books():
     except Exception as e:
         # Catch errors
         print(f"Error: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+        return jsonify({"error": "Internal Server Error " + e}), 500
 
 # --- RUN THE APP ---
 if __name__ == '__main__':
